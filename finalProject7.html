@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+   <head> 
+		<title>index</title>
+    <link rel="stylesheet" href="css10.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<script src="angular.min.js"></script>
+    <script src ="angular-route.js"></script>
+    <script src ="https://cdn.zingchart.com/zingchart.min.js"></script>
+	<link href="googlefonts2.css" rel="stylesheet">
+	<link href="googlefonts1.css" rel="stylesheet">
+</head>
+<body ng-app="myApp" ng-controller="artistController">
+<div class ="fix">
+		<ul class ="scrollmenu">
+			<li><a href="#">Home</a></li>
+			<li><a href="artistform2.html">Insert new Song</a></li>
+		</ul>
+</div>
+
+<div class="title">
+	<p>CLOUD LYRICA</p>
+</div>
+
+ 
+  
+  <div  class="sidenav">
+		<ul>
+      
+			<li ng-repeat="artist in artists">
+				<button button type="button" value="send" ng-click="artistid(artist.artistID)">
+				{{artist.artist}}
+            </button>
+			</li>
+        </ul>
+        
+	</div>
+	
+	
+
+<div class ="boxbox"  >
+    
+
+    
+	<div id="myChart"></div>
+
+    <ul>
+    
+        <li ng-repeat="album in albums">
+            <button button type="button" value="send" ng-click="albumid(album.albumID)">
+            {{album.albumTitle}}
+        </button>
+        </li>
+    </ul>
+
+    <ul>
+      
+        <li ng-repeat="song in songs2">
+            <button button type="button" value="send" ng-click="lyric(song.songID)">
+            {{song.songTitle}}
+        </button>
+        </li>
+    </ul>
+
+   
+
+    
+	<ng-view></ng-view>
+	
+	<div class ="boxboxbox">
+			
+		
+		</div>
+	
+		<div class ="bottombox">
+			<div >
+			
+				
+		
+	</div>
+		</div>	
+	
+	</div>
+
+	
+
+
+
+
+ <script>
+  var app = angular.module("myApp", ['ngRoute']);
+	app.config(function($routeProvider){
+		$routeProvider
+			.when('/artistform',{
+				templateUrl:'artistdropform2.html',
+				controller: 'artistController'
+
+			})
+			.when('/albumform',{
+				templateUrl: 'albumdropform.html',
+				controller: 'artistController'
+
+			}
+			)
+			.when('/songform',{
+				templateUrl:'songdropform.html',
+				controller: 'artistController'
+			}
+			)
+	
+});
+  app.controller('artistController', function($scope, $http)
+									{
+                                     $http.get("http://localhost:8080/artists/")
+                                     .then(  function(response) 
+                                      {
+                                         console.log(response);
+                                         $scope.artists = response.data;
+										 console.log("YESY");
+										 console.log($scope.artists);
+										 			});
+
+                                    $scope.clickButton = function(artistid){
+
+                                       // <a href="#!albumform">
+
+                                    }
+
+									$scope.artistid = function(artistid){
+									
+                                     $http.get("http://localhost:8080/albums/artist/"+artistid)
+                                     .then(  function(response) 
+                                                {
+                                                    console.log(response);
+													console.log("check");
+                                                    $scope.albums = response.data;
+                                                    console.log("YESZ");
+                                                    console.log($scope.albums);
+													
+																}
+													);};
+									
+                                     $http.get("http://localhost:8080/albums/")
+                                     .then(  function(response) 
+                                                {
+                                                    console.log(response);
+													console.log("check");
+                                                    $scope.album = response.data;
+                                                    console.log("YESA");
+                                                    console.log($scope.album);
+													
+																}
+													);
+									$scope.albumid = function(albumid){
+									
+                                     $http.get("http://localhost:8080/songs/album/"+albumid)
+                                     .then(  function(response) 
+                                                {
+                                                    console.log(response);
+													console.log("check");
+                                                    $scope.songs2 = response.data;
+                                                    console.log("YESB");
+                                                    console.log($scope.songs2);
+													
+																}
+													);};
+									$http.get("http://localhost:8080/songs/")
+                                     .then(  function(response) 
+                                                {
+                                                    console.log(response);
+                                                    $scope.songs = response.data;
+                                                    console.log("YESD");
+                                                    console.log($scope.songs);
+														}
+													);
+									
+										
+									$scope.songid = function(songid){
+									
+                                     $http.get("http://localhost:8080/writer/song/"+songid)
+                                     .then(  function(response) 
+                                                {
+                                                    console.log(response);
+													console.log("check");
+                                                    $scope.writers = response.data;
+                                                    console.log("YESF");
+                                                    console.log($scope.writers);
+													
+												});
+												};
+
+                                                
+
+                                               $scope.wordCloud = function(words){
+                                                
+                                                ZC.LICENSE=["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+                                                var myConfig = {
+                                                    type: 'wordcloud',
+                                                    options: {
+                                                        text: words,
+                                                        minLength: 4,
+                                                        ignore: ['establish','this'],
+                                                        
+                                                        stepAngle: 30,
+                                                        stepRadius: 30,
+                                                    }
+                                                    };
+
+                                                    zingchart.render({ 
+                                                        id: 'myChart', 
+                                                        data: myConfig, 
+                                                        height: 400, 
+                                                        width: '100%' 
+                                                    
+                                                    });
+                                                    console.log('this is IT');
+
+                                               };
+
+                                               $scope.lyric = function(songid2){
+									
+                                    $http.get("http://localhost:8080/lyrics/songID/"+songid2)
+                                    .then(  function(response) 
+                                               {
+                                                   console.log(response);
+                                                   console.log("check");
+                                                   $scope.lyrics = response.data;
+                                                   console.log("YESF");
+                                                   console.log($scope.lyrics);
+                                                   
+                                                   $scope.wordCloud(response.data[0].songLyrics);
+                                               });
+
+
+                                               };
+
+                                               
+});
+//lyrics/songID/{text}
+</script>
+ 
+</body>
+</html>
